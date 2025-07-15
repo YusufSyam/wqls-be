@@ -147,3 +147,10 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=10),
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
+
+DJOSER = {
+    'SERIALIZERS': {
+        'user_create': 'quiz.serializers.CustomRegisterSerializer',
+        'token_create': 'quiz.serializers.CustomLoginSerializer',
+    }
+}
