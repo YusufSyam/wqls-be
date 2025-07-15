@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'quiz',
-    'rest_framework',
     'rest_framework.authtoken',
     'djoser',
     'rest_framework_simplejwt.token_blacklist'
@@ -59,6 +58,9 @@ MIDDLEWARE = [
 ]
 
 # CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]
 
 ROOT_URLCONF = 'backend.urls'
 
