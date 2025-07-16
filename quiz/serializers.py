@@ -31,27 +31,33 @@ class QuizSessionSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'quiz', 'score', 'duration', 'user_start', 'user_end']
 
 class CustomRegisterSerializer(BaseUserCreateSerializer):
-    name = serializers.CharField()
-    number = serializers.CharField()
-    school = serializers.CharField()
-    tutor_name = serializers.CharField()
-    tutor_number = serializers.CharField()
+    name = serializers.CharField(required=False, allow_blank=True)
+    number = serializers.CharField(required=False, allow_blank=True)
+    school = serializers.CharField(required=False, allow_blank=True)
+    tutor_name = serializers.CharField(required=False, allow_blank=True)
+    tutor_number = serializers.CharField(required=False, allow_blank=True)
 
     class Meta(BaseUserCreateSerializer.Meta):
         model = User
         fields = ('id', 'username', 'email', 'password', 'name', 'number', 'school', 'tutor_name', 'tutor_number')
 
     def create(self, validated_data):
-        profile_fields = {
-            'name': validated_data.pop('name'),
-            'number': validated_data.pop('number'),
-            'school': validated_data.pop('school'),
-            'tutor_name': validated_data.pop('tutor_name'),
-            'tutor_number': validated_data.pop('tutor_number'),
-        }
+        name = validated_data.pop("name", "")
+        number = validated_data.pop("number", "")
+        school = validated_data.pop("school", "")
+        tutor_name = validated_data.pop("tutor_name", "")
+        tutor_number = validated_data.pop("tutor_number", "")
 
         user = super().create(validated_data)
-        UserProfile.objects.create(user=user, **profile_fields)
+        UserProfile.objects.create(
+            user=user,
+            name=name,
+            number=number,
+            school=school,
+            tutor_name=tutor_name,
+            tutor_number=tutor_number,
+        )
+        
         return user 
     
 class CustomLoginSerializer(TokenObtainPairSerializer):
