@@ -71,3 +71,24 @@ class CustomLoginSerializer(TokenObtainPairSerializer):
         }
 
         return data
+    
+
+class LeaderboardEntrySerializer(serializers.ModelSerializer):
+    user_name = serializers.SerializerMethodField()
+    school = serializers.SerializerMethodField()
+
+    class Meta:
+        model = QuizSession
+        fields = ['user_name', 'school', 'score', 'duration']
+
+    def get_user_name(self, obj):
+        try:
+            return obj.user.userprofile.name
+        except UserProfile.DoesNotExist:
+            return obj.user.username
+
+    def get_school(self, obj):
+        try:
+            return obj.user.userprofile.school
+        except UserProfile.DoesNotExist:
+            return ""

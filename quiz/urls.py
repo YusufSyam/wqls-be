@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import (
+    LeaderboardView,
     UserListView,
     UserProfileListCreateView,
     QuizListCreateView,
@@ -15,4 +16,5 @@ urlpatterns = [
     path('quiz-sessions/', QuizSessionListCreateView.as_view(), name='quizsession-list'),
     path('me/', MyProfileView.as_view(), name='my-profile'),
     path('logout/', LogoutView.as_view(), name='logout'),
+    path('leaderboard/', LeaderboardView.as_view(), name='leaderboard'),
 ]

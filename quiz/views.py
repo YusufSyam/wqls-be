@@ -12,6 +12,8 @@ from .serializers import (
     QuizSessionSerializer
 )
 from rest_framework_simplejwt.tokens import RefreshToken
+from .serializers import LeaderboardEntrySerializer
+from rest_framework import status
 
 # User (readonly)
 class UserListView(generics.ListAPIView):
@@ -51,3 +53,19 @@ class LogoutView(APIView):
             return Response(status=204)
         except Exception as e:
             return Response(status=400)
+        
+
+class LeaderboardView(APIView):
+    def get(self, request):
+        bidang = request.query_params.get('bidang')
+        if not bidang:
+            return Response({"error": "Parameter 'bidang' harus diberikan."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            quiz = Quiz.objects.get(bidang=bidang)
+        except Quiz.DoesNotExist:
+            return Response({"error": f"Tidak ada quiz dengan bidang '{bidang}'"}, status=status.HTTP_404_NOT_FOUND)
+
+        sessions = QuizSession.objects.filter(quiz=quiz).order_by('-score', 'duration')[:10]  # Top 10
+        serializer = LeaderboardEntrySerializer(sessions, many=True)
+        return Response(serializer.data)
