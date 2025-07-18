@@ -9,13 +9,12 @@ from .serializers import (
     UserSerializer,
     UserProfileSerializer,
     QuizSerializer,
-    QuizSessionSerializer
+    QuizSessionSerializer,
+    QuizSubmissionSerializer
 )
 from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import LeaderboardEntrySerializer
 from rest_framework import status
 from django.core.paginator import Paginator
-
 
 # User (readonly)
 class UserListView(generics.ListAPIView):
@@ -56,21 +55,6 @@ class LogoutView(APIView):
         except Exception as e:
             return Response(status=400)
         
-
-class LeaderboardView(APIView):
-    def get(self, request):
-        bidang = request.query_params.get('bidang')
-        if not bidang:
-            return Response({"error": "Parameter 'bidang' harus diberikan."}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            quiz = Quiz.objects.get(bidang=bidang)
-        except Quiz.DoesNotExist:
-            return Response({"error": f"Tidak ada quiz dengan bidang '{bidang}'"}, status=status.HTTP_404_NOT_FOUND)
-
-        sessions = QuizSession.objects.filter(quiz=quiz).order_by('-score', 'duration')[:10]  # Top 10
-        serializer = LeaderboardEntrySerializer(sessions, many=True)
-        return Response(serializer.data)
     
 class QuizLeaderboardView(APIView):
     def get(self, request, bidang):
@@ -120,3 +104,13 @@ class QuizLeaderboardView(APIView):
 
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class QuizSubmissionHistoryView(generics.ListAPIView):
+    serializer_class = QuizSubmissionSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return (
+            QuizSession.objects.filter(user=self.request.user)
+            .order_by("-user_end")  # ganti sesuai nama field timestamp kamu
+        )

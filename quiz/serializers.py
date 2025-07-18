@@ -3,7 +3,7 @@ from .models import UserProfile, Quiz, QuizSession
 from django.contrib.auth.models import User
 from djoser.serializers import UserCreateSerializer as BaseUserCreateSerializer
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from quiz.models import UserProfile
+from quiz.models import UserProfile, QuizSession
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -73,22 +73,7 @@ class CustomLoginSerializer(TokenObtainPairSerializer):
         return data
     
 
-class LeaderboardEntrySerializer(serializers.ModelSerializer):
-    user_name = serializers.SerializerMethodField()
-    school = serializers.SerializerMethodField()
-
+class QuizSubmissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = QuizSession
-        fields = ['user_name', 'school', 'score', 'duration']
-
-    def get_user_name(self, obj):
-        try:
-            return obj.user.userprofile.name
-        except UserProfile.DoesNotExist:
-            return obj.user.username
-
-    def get_school(self, obj):
-        try:
-            return obj.user.userprofile.school
-        except UserProfile.DoesNotExist:
-            return ""
+        fields = ["id", "quiz", "score", "duration", "user_end", "user_start"] 
