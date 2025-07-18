@@ -1,6 +1,6 @@
 from django.shortcuts import render
-from rest_framework import generics
-from rest_framework.permissions import IsAuthenticated
+from rest_framework import generics, permissions
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth.models import User
@@ -10,7 +10,9 @@ from .serializers import (
     UserProfileSerializer,
     QuizSerializer,
     QuizSessionSerializer,
-    QuizSubmissionSerializer
+    QuizSubmissionSerializer,
+    QuizSessionCreateSerializer,
+    QuizWithStatsSerializer
 )
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status
@@ -114,3 +116,17 @@ class QuizSubmissionHistoryView(generics.ListAPIView):
             QuizSession.objects.filter(user=self.request.user)
             .order_by("-user_end")  # ganti sesuai nama field timestamp kamu
         )
+    
+class SubmitQuizView(generics.CreateAPIView):
+    queryset = QuizSession.objects.all()
+    serializer_class = QuizSessionCreateSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+
+class QuizListWithStatsView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        quizzes = Quiz.objects.all().order_by('-start_date')
+        serializer = QuizWithStatsSerializer(quizzes, many=True, context={'request': request})
+        return Response(serializer.data)
