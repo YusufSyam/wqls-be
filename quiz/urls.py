@@ -9,7 +9,7 @@ from .views import (
     MyProfileView, 
     LogoutView,
     QuizSubmissionHistoryView,
-    SubmitQuizView
+    SubmitQuizView,
 )
 
 urlpatterns = [

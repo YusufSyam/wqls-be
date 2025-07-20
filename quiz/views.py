@@ -43,7 +43,27 @@ class MyProfileView(APIView):
 
     def get(self, request):
         user = request.user
-        return Response({"message": f"Hello, {user.username}!"})
+        try:
+            profile = user.userprofile
+            data = {
+                "id": user.id,
+                "username": user.username,
+                "email": user.email,
+                "name": profile.name,
+                "number": profile.number,
+                "school": profile.school,
+                "tutor_name": profile.tutor_name,
+                "tutor_number": profile.tutor_number
+            }
+        except UserProfile.DoesNotExist:
+            data = {
+                "id": user.id,
+                "username": user.username,
+                "email": user.email,
+                "error": "UserProfile not found."
+            }
+
+        return Response(data)
     
 class LogoutView(APIView):
     permission_classes = (IsAuthenticated,)
