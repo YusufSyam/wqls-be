@@ -41,6 +41,9 @@ class Command(BaseCommand):
             user.set_password('password123')
             user_list.append(user)
 
+            if(i%100==0):
+                print(f'{i} user generated..')
+
         User.objects.bulk_create(user_list)
         self.stdout.write("Created 10,000 users")
 
@@ -65,7 +68,7 @@ class Command(BaseCommand):
 
         # Create 20,000 QuizSession
         session_list = []
-        for _ in range(quizSessionCount):
+        for i in range(quizSessionCount):
             user = random.choice(users)
             quiz = random.choice(quizzes)
             start = fake.date_time_this_year()
@@ -82,6 +85,9 @@ class Command(BaseCommand):
                     user_end=end
                 )
             )
+            
+            if(i%100==0):
+                print(f'{i} quiz generated..')
 
         QuizSession.objects.bulk_create(session_list)
         self.stdout.write("Success created 20,000 quiz submissions")
