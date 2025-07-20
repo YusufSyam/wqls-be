@@ -6,6 +6,8 @@ import random
 from datetime import timedelta
 
 fake = Faker()
+userCount= 10000
+quizSessionCount= 20000
 
 class Command(BaseCommand):
     help = 'Seed database with dummy users, quizzes, and quiz sessions using bulk_create'
@@ -32,15 +34,15 @@ class Command(BaseCommand):
 
         # Generate 10,000 Users + UserProfiles
         user_list = []
-        for i in range(100):
+        for i in range(userCount):
             username = fake.user_name() + str(i)
             email = fake.email()
             user = User(username=username, email=email)
-            user.set_password('satusampai')
+            user.set_password('password123')
             user_list.append(user)
 
         User.objects.bulk_create(user_list)
-        self.stdout.write("✔ Created 10,000 users")
+        self.stdout.write("Created 10,000 users")
 
         # Get saved users (with IDs)
         users = list(User.objects.all())
@@ -59,11 +61,11 @@ class Command(BaseCommand):
                 )
             )
         UserProfile.objects.bulk_create(profile_list)
-        self.stdout.write("✔ Created 10,000 user profiles")
+        self.stdout.write("Success created 10,000 user profiles")
 
         # Create 20,000 QuizSession
         session_list = []
-        for _ in range(200):
+        for _ in range(quizSessionCount):
             user = random.choice(users)
             quiz = random.choice(quizzes)
             start = fake.date_time_this_year()
@@ -82,6 +84,6 @@ class Command(BaseCommand):
             )
 
         QuizSession.objects.bulk_create(session_list)
-        self.stdout.write("✔ Created 20,000 quiz submissions")
+        self.stdout.write("Success created 20,000 quiz submissions")
 
         self.stdout.write(self.style.SUCCESS("🎉 Done seeding all dummy data!"))
