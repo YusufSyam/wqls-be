@@ -9,12 +9,14 @@ django-cors-headers==4.7.0
 djangorestframework==3.16.0
 djangorestframework_simplejwt==5.5.0
 djoser==2.3.3
+dotenv==0.9.9
 Faker==37.4.0
 idna==3.10
 oauthlib==3.3.1
 psycopg2-binary==2.9.10
 pycparser==2.22
 PyJWT==2.9.0
+python-dotenv==1.1.1
 python3-openid==3.2.0
 requests==2.32.4
 requests-oauthlib==2.0.0
