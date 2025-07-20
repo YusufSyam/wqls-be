@@ -119,9 +119,25 @@ class QuizLeaderboardView(APIView):
                     "subject": bidang
                 })
 
+            userRankList = []
+            if request.user and request.user.is_authenticated:
+                user_sessions = sessions.filter(user=request.user)
+
+                for user_session in user_sessions:
+                    # Hitung ranking untuk sesi ini
+                    rank = 1 + sessions.filter(
+                        score__gt=user_session.score
+                    ).count() + sessions.filter(
+                        score=user_session.score,
+                        duration__lt=user_session.duration
+                    ).count()
+
+                    userRankList.append(rank)
+
             return Response({
                 "total": total,
-                "data": leaderboard
+                "data": leaderboard,
+                "userRankList": userRankList
             })
 
         except Exception as e:
@@ -150,3 +166,22 @@ class QuizListWithStatsView(APIView):
         quizzes = Quiz.objects.all().order_by('-start_date')
         serializer = QuizWithStatsSerializer(quizzes, many=True, context={'request': request})
         return Response(serializer.data)
+    
+class UpdateProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request):
+        user = request.user
+        try:
+            profile = user.userprofile
+        except UserProfile.DoesNotExist:
+            return Response({"error": "UserProfile not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = UserProfileSerializer(profile, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                "message": "Profile updated successfully",
+                "profile": serializer.data
+            }, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
